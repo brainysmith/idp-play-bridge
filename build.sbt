@@ -1,7 +1,7 @@
 import de.johoop.jacoco4sbt._
 import JacocoPlugin._
  
-name := "conf-lib"
+name := "idp-play-bridge"
 
 organization := "com.identityblitz"
 
