@@ -7,33 +7,39 @@ organization := "com.identityblitz"
 
 version := "1.0"
 
+licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
+
+homepage := Some(url("https://github.com/brainysmith/idp-play-bridge"))
+
 scalaVersion := "2.10.3"
 
-//Define dependencies. These ones are only required for Test and Integration Test scopes.
+crossPaths := false
+
+publishMavenStyle := true
+
+publishArtifact in Test := false
+
+resolvers += "Local Maven Repository" at Path.userHome.asFile.toURI.toURL + "/.m2/repository"
+
+resolvers += "Typesafe releases" at "http://repo.typesafe.com/typesafe/releases"
+
 libraryDependencies ++= Seq(
-    "org.scalatest" % "scalatest_2.10" % "2.0.1-SNAP" % "test,it",
-    "org.scalacheck" %% "scalacheck" % "1.11.2" % "test,it"	
+  "com.typesafe.play" % "play_2.10" % "2.2.2",
+  /*"javax.servlet" % "javax.servlet-api" % "3.0.1" % "provided",*/
+  "com.identityblitz" % "login-framework" % "0.1.2",
+  "edu.internet2.middleware" % "shibboleth-identityprovider" % "blitz-patched-pure",
+  "org.scalatest" % "scalatest_2.10" % "2.0.1-SNAP" % "test,it",
+  "org.scalacheck" %% "scalacheck" % "1.11.2" % "test,it"
 )
 
-// For Settings/Task reference, see http://www.scala-sbt.org/release/sxr/sbt/Keys.scala.html
-
-// Compiler settings. Use scalac -X for other options and their description.
-// See Here for more info http://www.scala-lang.org/files/archive/nightly/docs/manual/html/scalac.html 
 scalacOptions ++= List("-feature","-deprecation", "-unchecked")
 
-// ScalaTest settings.
-// Ignore tests tagged as @Slow (they should be picked only by integration test)
 testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-l", "org.scalatest.tags.Slow")
 
 //Code Coverage section
 jacoco.settings
 
-//itJacoco.settings
-
-//Style Check section 
+//Style Check section
 org.scalastyle.sbt.ScalastylePlugin.Settings
  
 org.scalastyle.sbt.PluginKeys.config <<= baseDirectory { _ / "src/main/config" / "scalastyle-config.xml" }
-
-// Generate Eclipse project with sources for dependencies
-EclipseKeys.withSource := true

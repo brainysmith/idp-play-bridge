@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:resolver="urn:mace:shibboleth:2.0:resolver"
+        targetNamespace="urn:identityblitz:shibboleth:2.0:resolver:ar" elementFormDefault="qualified">
+
+    <import namespace="urn:mace:shibboleth:2.0:resolver" schemaLocation="classpath:/schema/shibboleth-2.0-attribute-resolver.xsd"/>
+
+    <complexType name="SessionConnector">
+        <annotation>
+            <documentation>
+                A data connector that gets its information from the current Identity Blitz principal stored in the session.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="resolver:BaseDataConnectorType">
+            </extension>
+        </complexContent>
+    </complexType>
+
+</schema>
