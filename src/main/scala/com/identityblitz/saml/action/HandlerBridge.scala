@@ -4,8 +4,6 @@ import play.api.mvc.{Request, Controller}
 import com.identityblitz.saml.IdpPlayBridge.samlCtx
 import edu.internet2.middleware.shibboleth.common.profile.{ProfileHandler, ProfileHandlerManager}
 import edu.internet2.middleware.shibboleth.idp.session.Session
-import org.opensaml.util.storage.StorageService
-import edu.internet2.middleware.shibboleth.idp.authn.LoginContextEntry
 import com.identityblitz.saml.ws.transport.{PlayResponseAdapter, PlayRequestAdapter}
 import java.net.URL
 import play.api.Play
@@ -19,7 +17,7 @@ import java.io.BufferedReader
 import java.security.Principal
 import play.api.mvc.RawBuffer
 import play.api.mvc.SimpleResult
-import com.identityblitz.saml.IdpPlayBridge.logger
+import com.identityblitz.saml.IdpPlayBridge.{logger, contextPath}
 
 /**
  */
@@ -30,11 +28,13 @@ trait HandlerBridge {
   private lazy val httpsPort = Play.current.configuration.getInt("https.port").getOrElse(0)
   private lazy val handlerManager = samlCtx.getBean("shibboleth.HandlerManager").asInstanceOf[ProfileHandlerManager]
 
+  private lazy val profileContextPath = contextPath + "/profile"
+
   protected def getTransports(implicit request: Request[RawBuffer]): (PlayRequestAdapter, PlayResponseAdapter) = {
     val absoluteUrl = "http" + (if (request.host.endsWith(":" + httpsPort)) "s" else "") + "://" + request.host + request.uri
     val inTr = new PlayRequestAdapter(request,
       Map("URL" -> new URL(absoluteUrl),
-        "CONTEXT_PATH" -> "/blitz/saml",
+        "CONTEXT_PATH" -> profileContextPath,
         "REMOTE_ADDRESS" -> request.remoteAddress,
         Session.HTTP_SESSION_BINDING_ATTRIBUTE -> getIdpSession.getOrElse(null)))
     inTr -> new PlayResponseAdapter(inTr, request)

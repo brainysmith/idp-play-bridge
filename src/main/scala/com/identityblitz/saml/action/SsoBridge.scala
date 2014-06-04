@@ -91,8 +91,7 @@ trait SsoBridge {
       idpLgnCtx.setAuthenticationFailure(new AuthenticationException(error))
     }}
 
-    //todo: thinking how remove profile strip
-    callHandler(idpLgnCtx.getProfileHandlerURL.stripPrefix("/profile"))
+    callHandler(idpLgnCtx.getProfileHandlerURL)
   }
 
 }

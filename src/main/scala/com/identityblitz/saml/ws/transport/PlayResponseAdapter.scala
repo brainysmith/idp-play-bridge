@@ -35,7 +35,7 @@ class PlayResponseAdapter(private val inTr: PlayRequestAdapter,
   private val attributes = scala.collection.mutable.Map[String, AnyRef]()
 
   private val directCalls = Map[String, (PlayRequestAdapter, PlayResponseAdapter) => Action[_]](
-    (contextPath + "/AuthnEngine") -> ((inTr, outTr) => Saml.startLogin(inTr, outTr)),
+    (contextPath + "/profile/AuthnEngine") -> ((inTr, outTr) => Saml.startLogin(inTr, outTr)),
     "/SLOServlet" -> ((inTr, outTr) => Saml.startLogout(inTr, outTr))
   )
 
@@ -87,7 +87,7 @@ class PlayResponseAdapter(private val inTr: PlayRequestAdapter,
 
   override def getPeerCredential: Credential = null
 
-  /*todo: set secure true*/
+  /*todo: move the parameters to configuration*/
   override def addCookie(name: String, value: String): Unit = {
     cookiesToAdd += Cookie(name, value, maxAge = None, path = "/blitz", domain = None, secure = false, httpOnly = true)
   }

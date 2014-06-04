@@ -77,13 +77,11 @@ trait SloBridge {
             }
             Future.successful(Ok(JsArray(res)).withHeaders(headers: _*))
           case (None, Some(_), None) =>
-            //todo: thinking how remove profile strip
-            callHandler(sloContext.getProfileHandlerURL.stripPrefix("/profile"))
+            callHandler(sloContext.getProfileHandlerURL)
           case (None, None, Some(_)) =>
             SLOHelper.unbindSingleLogoutContext(storageService, itr, otr)
             SLOHelper.bindSingleLogoutContext(sloContext, otr)
-            //todo: thinking how remove profile strip
-            callHandler(sloContext.getProfileHandlerURL.stripPrefix("/profile"))
+            callHandler(sloContext.getProfileHandlerURL)
           case _ =>
             val err = s"Unknown logout action [query string = ${req.rawQueryString}]"
             logger.error(err)
