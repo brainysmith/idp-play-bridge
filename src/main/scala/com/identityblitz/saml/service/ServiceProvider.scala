@@ -10,7 +10,7 @@ object ServiceProvider {
   lazy val confService = {
     val csItr = ServiceLoader.load(classOf[IdpPlayBridgeConfService]).iterator()
     if(!csItr.hasNext)
-      throw new RuntimeException("log configuration service is undefined.")
+      throw new RuntimeException("idp play bridge configuration service is undefined.")
     csItr.next()
   }
 

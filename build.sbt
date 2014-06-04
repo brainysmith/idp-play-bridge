@@ -5,7 +5,7 @@ name := "idp-play-bridge"
 
 organization := "com.identityblitz"
 
-version := "1.0"
+version := "0.1.0"
 
 licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
 
