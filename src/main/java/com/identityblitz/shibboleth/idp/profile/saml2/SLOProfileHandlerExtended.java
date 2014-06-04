@@ -41,7 +41,6 @@ public class SLOProfileHandlerExtended extends SLOProfileHandler {
             log.debug("Processing incoming SAML LogoutResponse");
             processLogoutResponse(sloContext, inTransport, outTransport);
         } else if (itr.getParameterValue("finish") != null) { //Front-channel case only
-            //TODO this is just a hack
             if (sloContext.getRequesterEntityID() != null) {
                 InitialLogoutRequestContext initialRequest = buildRequestContext(sloContext, inTransport, outTransport);
                 respondToInitialRequest(sloContext, initialRequest);

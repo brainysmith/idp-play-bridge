@@ -72,7 +72,7 @@ trait SsoBridge {
         idpSession.setSubject(sbj)
         /** create authentication method information **/
         val aInstant = new DateTime()
-        /*todo: add an authentication duration to the blitz login context*/
+        /*todo: add an authentication duration to the blitz login session*/
         val aDuration = 30*60*1000
         val aMethod = (blitzLs \ "completedMethods").as[Array[String]].mkString(",")
         val aMethodInfo = new AuthenticationMethodInformationImpl(sbj, prn, aMethod, aInstant, aDuration)

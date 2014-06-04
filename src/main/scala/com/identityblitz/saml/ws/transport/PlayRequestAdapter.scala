@@ -18,7 +18,6 @@ class PlayRequestAdapter(private val request: Request[RawBuffer],
 
   private val attributes = scala.collection.mutable.Map[String, AnyRef](_attributes.toSeq: _*)
 
-  //todo: try to get the real peer domain
   override def getPeerDomainName: String = request.remoteAddress
 
   override def getPeerAddress: String = request.remoteAddress

@@ -3,8 +3,11 @@ package com.identityblitz.saml
 import org.springframework.context.support.{ClassPathXmlApplicationContext, AbstractApplicationContext}
 import org.slf4j.LoggerFactory
 import com.identityblitz.saml.service.ServiceProvider.confService
+import scala.Some
+
 /**
  */
+/*todo: remove idp session cookie after logout*/
 object IdpPlayBridge {
 
   private var _samlCtx: Option[AbstractApplicationContext] = None
@@ -13,7 +16,14 @@ object IdpPlayBridge {
 
   lazy val contextPath = confService.getOptString("context-path").getOrElse("/saml")
 
+  lazy val claimOfPrincipalName = confService.getOptString("claim-of-principal-name").getOrElse("uid")
+
   lazy val logoutPage = confService.logoutPage
+
+  lazy val cookie = CookieConf(confService.getOptString("cookie.path").getOrElse("/"),
+    confService.getOptString("cookie.domain"),
+    confService.getOptBoolean("cookie.secure").getOrElse(true),
+    confService.getOptBoolean("cookie.httpOnly").getOrElse(true))
 
   def init() = {
     _samlCtx = Some(new ClassPathXmlApplicationContext(Array("/internal.xml", "/service.xml")))
@@ -23,3 +33,5 @@ object IdpPlayBridge {
     "call IdpPlayBridge.init() before."))
 
 }
+
+case class CookieConf(path: String, domain: Option[String], secure: Boolean, httpOnly: Boolean)

@@ -6,7 +6,6 @@ import java.util
 import org.opensaml.ws.transport.http.HTTPTransport.HTTP_VERSION
 import play.api.mvc._
 import play.api.mvc.Results._
-import PlayResponseAdapter._
 import com.identityblitz.shibboleth.idp.saml.ws.transposrt.HTTPOutTransportWithCookie
 import play.api.mvc.DiscardingCookie
 import play.api.mvc.RawBuffer
@@ -16,7 +15,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.net.{MalformedURLException, URL}
 import scala.util.Try
 import com.identityblitz.saml.action.Saml
-import com.identityblitz.saml.IdpPlayBridge.contextPath
+import com.identityblitz.saml.IdpPlayBridge.{contextPath, cookie}
+import play.api.http.HeaderNames
 
 /**
   */
@@ -87,13 +87,12 @@ class PlayResponseAdapter(private val inTr: PlayRequestAdapter,
 
   override def getPeerCredential: Credential = null
 
-  /*todo: move the parameters to configuration*/
   override def addCookie(name: String, value: String): Unit = {
-    cookiesToAdd += Cookie(name, value, maxAge = None, path = "/blitz", domain = None, secure = false, httpOnly = true)
+    cookiesToAdd += Cookie(name, value, maxAge = None, path = cookie.path, domain = cookie.domain, secure = cookie.secure, httpOnly = cookie.httpOnly)
   }
 
   override def discardCookie(name: String): Unit = {
-    cookiesToDiscard += DiscardingCookie(name, path = "/blitz", domain = None, secure = false)
+    cookiesToDiscard += DiscardingCookie(name, path = cookie.path, domain = cookie.domain, secure = cookie.secure)
   }
 
   def cookies = cookiesToAdd.toSeq
@@ -104,8 +103,8 @@ class PlayResponseAdapter(private val inTr: PlayRequestAdapter,
     import ExecutionContext.Implicits.global
     redirectLocation.fold {
       characterEncoding foreach (encoding =>
-        headers.get(CONTENT_TYPE_HEADER_NAME) foreach (ct => {
-          headers += CONTENT_TYPE_HEADER_NAME -> (ct + "; " + encoding)
+        headers.get(HeaderNames.CONTENT_TYPE) foreach (ct => {
+          headers += HeaderNames.CONTENT_TYPE -> (ct + "; " + encoding)
         }))
       Future.successful(Status(statusCode.getOrElse(200))
         .apply(outputStream.toByteArray)
@@ -118,11 +117,5 @@ class PlayResponseAdapter(private val inTr: PlayRequestAdapter,
     }))
       .map(_.withCookies(cookiesToAdd: _*).discardingCookies(cookiesToDiscard: _*))
   }
-
-}
-
-object PlayResponseAdapter {
-
-  val CONTENT_TYPE_HEADER_NAME = "Content-Type"
 
 }
