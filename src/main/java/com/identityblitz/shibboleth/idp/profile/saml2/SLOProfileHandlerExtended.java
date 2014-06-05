@@ -1,5 +1,6 @@
 package com.identityblitz.shibboleth.idp.profile.saml2;
 
+import com.identityblitz.saml.action.SessionBridge$;
 import com.identityblitz.shibboleth.idp.saml.ws.transposrt.HTTPInTransportWithCookie;
 import com.identityblitz.shibboleth.idp.saml.ws.transposrt.HTTPOutTransportWithCookie;
 import com.identityblitz.shibboleth.idp.slo.SLOHelper;
@@ -118,6 +119,7 @@ public class SLOProfileHandlerExtended extends SLOProfileHandler {
         // gam TODO support partial logout (not delete all session but delete sp info from session)
         SingleLogoutContext sloContext = buildSingleLogoutContext(initialRequest, idpSession);
         destroySession(sloContext);
+        otr.discardCookie(SessionBridge$.MODULE$.IDP_SESSION_COOKIE_NAME());
 
         if (getInboundBinding().equals(SAMLConstants.SAML2_SOAP11_BINDING_URI)) {
             log.info("Issuing Backchannel logout requests");

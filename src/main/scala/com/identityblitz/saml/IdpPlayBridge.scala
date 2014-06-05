@@ -7,7 +7,6 @@ import scala.Some
 
 /**
  */
-/*todo: remove idp session cookie after logout*/
 object IdpPlayBridge {
 
   private var _samlCtx: Option[AbstractApplicationContext] = None

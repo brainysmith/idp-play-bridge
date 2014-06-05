@@ -9,13 +9,11 @@ import org.joda.time.DateTime
 import com.identityblitz.saml.IdpPlayBridge.{samlCtx, logger}
 import edu.internet2.middleware.shibboleth.common.session.SessionManager
 import java.security.{GeneralSecurityException, MessageDigest}
+import SessionBridge.IDP_SESSION_COOKIE_NAME
 
 /**
  */
 trait SessionBridge {
-
-  /** Name of the IdP Cookie containing the IdP session ID. */
-  protected val IDP_SESSION_COOKIE_NAME = "_idp_session"
 
   /** Whether the client must always come back from the same address. */
   protected val ensureConsistentClientAddress = false
@@ -99,5 +97,12 @@ trait SessionBridge {
       .toString()
 
   }
+
+}
+
+object SessionBridge {
+
+  /** Name of the IdP Cookie containing the IdP session ID. */
+  val IDP_SESSION_COOKIE_NAME = "_idp_session"
 
 }
