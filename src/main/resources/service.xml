@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<srv:Services xmlns:srv="urn:mace:shibboleth:2.0:services" xmlns:attribute-afp="urn:mace:shibboleth:2.0:afp" 
-              xmlns:attribute-authority="urn:mace:shibboleth:2.0:attribute:authority" xmlns:attribute-resolver="urn:mace:shibboleth:2.0:resolver" 
-              xmlns:profile="urn:mace:shibboleth:2.0:idp:profile-handler" xmlns:relyingParty="urn:mace:shibboleth:2.0:relying-party" 
-              xmlns:resource="urn:mace:shibboleth:2.0:resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<srv:Services xmlns:srv="urn:mace:shibboleth:2.0:services"
+              xmlns:attribute-afp="urn:mace:shibboleth:2.0:afp"
+              xmlns:attribute-authority="urn:mace:shibboleth:2.0:attribute:authority"
+              xmlns:attribute-resolver="urn:mace:shibboleth:2.0:resolver"
+              xmlns:profile="urn:mace:shibboleth:2.0:idp:profile-handler"
+              xmlns:relyingParty="urn:mace:shibboleth:2.0:relying-party"
+              xmlns:resource="urn:mace:shibboleth:2.0:resource"
+              xmlns:ib-resource="urn:identityblitz:shibboleth:2.0:resource"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="urn:mace:shibboleth:2.0:services classpath:/schema/shibboleth-2.0-services.xsd
                                   urn:mace:shibboleth:2.0:afp classpath:/schema/shibboleth-2.0-afp.xsd
                                   urn:mace:shibboleth:2.0:attribute:authority classpath:/schema/shibboleth-2.0-attribute-authority.xsd
                                   urn:mace:shibboleth:2.0:resolver classpath:/schema/shibboleth-2.0-attribute-resolver.xsd
                                   urn:mace:shibboleth:2.0:idp:profile-handler classpath:/schema/shibboleth-2.0-idp-profile-handler.xsd
                                   urn:mace:shibboleth:2.0:relying-party classpath:/schema/shibboleth-2.0-relying-party.xsd
-                                  urn:mace:shibboleth:2.0:resource classpath:/schema/shibboleth-2.0-resource.xsd">
+                                  urn:mace:shibboleth:2.0:resource classpath:/schema/shibboleth-2.0-resource.xsd
+                                  urn:identityblitz:shibboleth:2.0:resource classpath:/schema/shibboleth-2.0-resource-ib.xsd">
 
     <srv:Service id="shibboleth.AttributeResolver" xsi:type="attribute-resolver:ShibbolethAttributeResolver">
-        <srv:ConfigurationResource file="/opt/git/data/idp/conf/attribute-resolver.xml" xsi:type="resource:FilesystemResource"/>
+        <srv:ConfigurationResource file="${meta-uri}/conf/attribute-resolver.xml" xsi:type="ib-resource:FilesystemResource"/>
     </srv:Service>
 
     <srv:Service id="shibboleth.AttributeFilterEngine" xsi:type="attribute-afp:ShibbolethAttributeFilteringEngine">
-        <srv:ConfigurationResource file="/opt/git/data/idp/conf/attribute-filter.xml" xsi:type="resource:FilesystemResource"/>
+        <srv:ConfigurationResource file="${meta-uri}/conf/attribute-filter.xml" xsi:type="ib-resource:FilesystemResource"/>
     </srv:Service>
     
     <srv:Service id="shibboleth.SAML1AttributeAuthority" xsi:type="attribute-authority:SAML1AttributeAuthority" 
@@ -29,11 +35,11 @@
 
     <srv:Service id="shibboleth.RelyingPartyConfigurationManager" xsi:type="relyingParty:SAMLMDRelyingPartyConfigurationManager" 
                  depends-on="shibboleth.SAML1AttributeAuthority shibboleth.SAML2AttributeAuthority">
-        <srv:ConfigurationResource file="/opt/git/data/idp/conf/relying-party.xml" xsi:type="resource:FilesystemResource"/>
+        <srv:ConfigurationResource file="${meta-uri}/conf/relying-party.xml" xsi:type="ib-resource:FilesystemResource"/>
     </srv:Service>
 
     <srv:Service id="shibboleth.HandlerManager" depends-on="shibboleth.RelyingPartyConfigurationManager" xsi:type="profile:IdPProfileHandlerManager">
-        <srv:ConfigurationResource file="/opt/git/data/idp/conf/handler.xml" xsi:type="resource:FilesystemResource"/>
+        <srv:ConfigurationResource file="${meta-uri}/conf/handler.xml" xsi:type="ib-resource:FilesystemResource"/>
     </srv:Service>
     
     <!-- 

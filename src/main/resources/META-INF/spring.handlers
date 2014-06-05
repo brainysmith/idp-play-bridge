@@ -1,3 +1,6 @@
 urn\:identityblitz\:shibboleth\:2.0\:idp\:profile-handler = com.identityblitz.shibboleth.idp.config.profile.ProfileHandlerNamespaceHandler
 urn\:identityblitz\:shibboleth\:2.0\:security\:saml = com.identityblitz.shibboleth.idp.config.security.saml.SAMLSecurityNamespaceHandlerExtended
 urn\:identityblitz\:shibboleth\:2.0\:resolver\:ar = com.identityblitz.saml.dc.AttributeResolverNamespaceHandler
+urn\:identityblitz\:shibboleth\:2.0\:metadata = com.identityblitz.shibboleth.idp.config.metadata.MetadataNamespaceHandlerIB
+urn\:identityblitz\:shibboleth\:2.0\:resource =  com.identityblitz.shibboleth.idp.config.resource.ResourceNamespaceHandlerIB
+urn\:identityblitz\:shibboleth\:2.0\:security = com.identityblitz.shibboleth.idp.config.security.SecurityNamespaceHandlerIB

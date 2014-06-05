@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:shibmd="urn:mace:shibboleth:2.0:metadata"
+        targetNamespace="urn:identityblitz:shibboleth:2.0:metadata" elementFormDefault="qualified">
+
+    <annotation>
+        <documentation>Schema describing metadata providers and filters.</documentation>
+    </annotation>
+
+    <import namespace="urn:mace:shibboleth:2.0:metadata" schemaLocation="classpath:/schema/shibboleth-2.0-metadata.xsd"/>
+
+
+    <complexType name="FileBackedHTTPMetadataProvider">
+        <annotation>
+            <documentation>
+                A metadata provider that periodically pulls metadata from a given URL. If the metadata is
+                valid it is
+                stored to disk. If the the provided URL can not be reached or the metadata retrieved is
+                invalid this
+                provider will fall back to its on-disk copy.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="shibmd:HTTPMetadataProvider">
+                <attribute name="backingFile" type="string" use="required">
+                    <annotation>
+                        <documentation>
+                            The path to the temporary file used to store valid metadata on-disk.
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="FilesystemMetadataProvider">
+        <annotation>
+            <documentation>A metatadata provider that reads SAML2 metadata from the filesystem.</documentation>
+        </annotation>
+        <complexContent>
+            <extension base="shibmd:ReloadingMetadataProviderType">
+                <attribute name="metadataFile" type="string" use="required">
+                    <annotation>
+                        <documentation>The path to the metadata file.</documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="maintainExpiredMetadata" type="boolean">
+                    <annotation>
+                        <documentation>This is deprecated, use requireValidMetadata instead.</documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
+</schema>

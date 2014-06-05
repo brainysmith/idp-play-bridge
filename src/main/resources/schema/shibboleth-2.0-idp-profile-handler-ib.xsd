@@ -11,6 +11,26 @@
         </xsd:documentation>
     </xsd:annotation>
 
+    <xsd:complexType name="SAMLMetadata">
+        <xsd:annotation>
+            <xsd:documentation>Basic handler that returns a general status of the IdP.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="ph:RequestURIMappedProfileHandlerType">
+                <xsd:attribute name="metadataFile" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>Location of the static IdP metadata file.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="parserPoolRef" type="xsd:string" default="shibboleth.ParserPool">
+                    <xsd:annotation>
+                        <xsd:documentation>Reference to the parser pool used to parse the metadata.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:complexType name="SAML2SSO">
         <xsd:annotation>
             <xsd:documentation>Configuration type for SAML 2 SSO profile handlers.</xsd:documentation>

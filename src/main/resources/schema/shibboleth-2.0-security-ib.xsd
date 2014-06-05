@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:sec="urn:mace:shibboleth:2.0:security"
+        targetNamespace="urn:identityblitz:shibboleth:2.0:security"
+        elementFormDefault="qualified">
+
+    <import namespace="urn:mace:shibboleth:2.0:security" schemaLocation="classpath:/schema/shibboleth-2.0-security.xsd"/>
+        
+    <!-- CREDENTIAL RELATED OBJECTS -->
+    <complexType name="X509Filesystem">
+        <annotation>
+            <documentation>
+                Allows credential components to be specified by filesystem path. Keys, Certificates, and CRLs may be
+                PKCS#12, DER, or PEM encoded and may be encrypted or not.
+                
+                This method is deprecated in favor of the X509ResourceBacked type employing a filesystem resource.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="sec:X509Credential"/>
+        </complexContent>
+    </complexType>
+
+    <complexType name="BasicFilesystem">
+        <annotation>
+            <documentation>
+                Allows credential components to be specified by filesystem path.
+                Keys may be PKCS#12, DER, or PEM encoded and may be encrypted or not.
+
+                This method is deprecated in favor of the BasicResourceBacked type
+                employing a filesystem resource.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="sec:BasicCredential"/>
+        </complexContent>
+    </complexType>
+
+
+    <!-- VALIDATION RELATED OBJECTS, FOR EXAMPLE PKIX INFO -->
+    <complexType name="PKIXFilesystem">
+        <annotation>
+            <documentation>
+                Allows PKIX validation info components to be specified by filesystem path.
+                Certificates, and CRLs may be PKCS#12, DER, or PEM encoded and may be encrypted or not.
+                
+                This method is deprecated in favor of the PKIXResourceBacked type employing a filesystem resource.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="sec:PKIXValidationInfoType"/>
+        </complexContent>
+    </complexType>
+</schema>

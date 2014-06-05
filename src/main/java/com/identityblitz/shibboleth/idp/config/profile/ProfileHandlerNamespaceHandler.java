@@ -16,6 +16,9 @@ public class ProfileHandlerNamespaceHandler extends BaseSpringNamespaceHandler {
     /** {@inheritDoc} */
     public void init() {
 
+        registerBeanDefinitionParser(SAMLMetadataHandlerBeanDefinitionParserIB.SCHEMA_TYPE,
+                new SAMLMetadataHandlerBeanDefinitionParserIB());
+
         registerBeanDefinitionParser(SAML2SSOProfileHandlerBeanDefinitionParser.SCHEMA_TYPE,
                 new SAML2SSOProfileHandlerBeanDefinitionParser());
 
