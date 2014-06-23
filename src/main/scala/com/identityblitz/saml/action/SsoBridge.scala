@@ -5,7 +5,7 @@ import com.identityblitz.login.glue.play.{Forwardable, LoginRequest, LoginAction
 import play.api.mvc.{Controller, AnyContent, Request}
 import com.identityblitz.saml.IdpPlayBridge._
 import scala.Some
-import com.identityblitz.login.RelyingParty
+import com.identityblitz.login.{LoginFramework, FlowAttrName, RelyingParty}
 import com.identityblitz.shibboleth.idp.util.HttpHelper
 import com.identityblitz.json.JVal
 import javax.security.auth.Subject
@@ -46,24 +46,30 @@ trait SsoBridge {
     }
   }
 
-  /**todo: rewrite - it's version only for prototype **/
   def completeLogin = Forwardable.async(parse.raw) { implicit request =>
     if (logger.isTraceEnabled)
       logger.trace("Completing login process by SAML")
-
-    val blitzLs = JVal.parseStr(request.tags("ls"))
-    val claims = blitzLs \ "claims"
-    val sbj = new Subject()
-    val prn = SamlPrincipal(claims)
-
     implicit val (inTr, outTr) = getTransports
     implicit val idpLgnCtx = getIdpLoginContext
-    request.tags.get("error").fold{
+
+    def fail(error: String) = {
+      /** some error has occurred **/
+      logger.warn("Authentication failure: {}", error)
+      idpLgnCtx.setPrincipalAuthenticated(false)
+      idpLgnCtx.setAuthenticationFailure(new AuthenticationException(error))
+    }
+
+    def success() = {
       /** the login complete successfully **/
+      val blitzLs = JVal.parseStr(request.tags("ls"))
+      if (logger.isDebugEnabled)
+        logger.debug("Authentication is successful: {}", blitzLs.toJson)
+      val claims = blitzLs \ "claims"
+      val sbj = new Subject()
+      val prn = SamlPrincipal(claims)
       idpLgnCtx.setPrincipalAuthenticated(true)
       getIdpSession.orElse{
-        if (logger.isDebugEnabled)
-          logger.debug("Creating shibboleth session for principal {}", prn)
+        logger.debug("Creating shibboleth session for principal {}", prn)
         val idpSession = createIdpSession
         idpLgnCtx.setSessionID(idpSession.getSessionID)
         Some(idpSession)
@@ -72,8 +78,7 @@ trait SsoBridge {
         idpSession.setSubject(sbj)
         /** create authentication method information **/
         val aInstant = new DateTime()
-        /*todo: add an authentication duration to the blitz login session*/
-        val aDuration = 30*60*1000
+        val aDuration = LoginFramework.sessionConf.ttl
         val aMethod = (blitzLs \ "completedMethods").as[Array[String]].mkString(",")
         val aMethodInfo = new AuthenticationMethodInformationImpl(sbj, prn, aMethod, aInstant, aDuration)
         idpLgnCtx.setAuthenticationMethodInformation(aMethodInfo)
@@ -85,13 +90,9 @@ trait SsoBridge {
       })
       if (logger.isDebugEnabled)
         logger.debug("User [principal = {}] authenticated with method {}", Array(prn, idpLgnCtx.getAuthenticationMethod))
-    }{error => {
-      /** some error has occurred **/
-      idpLgnCtx.setPrincipalAuthenticated(false)
-      idpLgnCtx.setAuthenticationFailure(new AuthenticationException(error))
-    }}
+    }
 
+    request.tags.get(FlowAttrName.ERROR).fold(success())(fail)
     callHandler(idpLgnCtx.getProfileHandlerURL)
   }
-
 }

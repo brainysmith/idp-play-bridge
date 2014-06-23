@@ -2,7 +2,7 @@ package com.identityblitz.saml.action
 
 import play.api.mvc.{Request, Controller}
 import com.identityblitz.saml.IdpPlayBridge.samlCtx
-import edu.internet2.middleware.shibboleth.common.profile.{ProfileHandler, ProfileHandlerManager}
+import edu.internet2.middleware.shibboleth.common.profile._
 import edu.internet2.middleware.shibboleth.idp.session.Session
 import com.identityblitz.saml.ws.transport.{PlayResponseAdapter, PlayRequestAdapter}
 import java.net.URL
@@ -15,12 +15,13 @@ import java.util
 import java.util.Locale
 import java.io.BufferedReader
 import java.security.Principal
+import com.identityblitz.saml.IdpPlayBridge.{logger, contextPath}
 import play.api.mvc.RawBuffer
 import play.api.mvc.SimpleResult
-import com.identityblitz.saml.IdpPlayBridge.{logger, contextPath}
+import scala.util.{Failure, Try}
 
 /**
- */
+  */
 trait HandlerBridge {
   this: Controller with SessionBridge =>
 
@@ -41,153 +42,163 @@ trait HandlerBridge {
   }
 
   protected def callHandler(handler: String)(implicit inTr: PlayRequestAdapter, outTr: PlayResponseAdapter): Future[SimpleResult] = {
-    Option(handlerManager.getProfileHandler(new ServletRequestMock(handler)).asInstanceOf[ProfileHandler[InTransport,OutTransport]])
-      .fold[Future[SimpleResult]]{
-      val err = s"IDP handler '$handler' is not found"
-      logger.error(err)
-      throw new IllegalArgumentException(err)
-    }{idpHandler => {
-      /*todo: handle error correctly*/
-      val errorHandler = handlerManager.getErrorHandler
+    val errorHandler = handlerManager.getErrorHandler
+    val idpHandler = handlerManager.getProfileHandler(new ServletRequestMock(handler)).asInstanceOf[ProfileHandler[InTransport,OutTransport]]
+
+    Try {
+      if (idpHandler == null) {
+        logger.error("No profile handler configured for request at path: {}", handler)
+        throw new NoProfileHandlerException("No profile handler configured for request at path: " + handler)
+      }
       idpHandler.processRequest(inTr, outTr)
-      outTr.result
-    }}
-  }
+    }.recoverWith {
+      case pe: ProfileException =>
+        inTr.setAttribute(AbstractErrorHandler.ERROR_KEY, pe)
+        errorHandler.processRequest(inTr, outTr)
+        Failure(pe)
+      case _ @ t =>
+        logger.error("Error occurred while processing request", t)
+        errorHandler.processRequest(inTr, outTr)
+        Failure(t)
+    }
 
-  protected class ServletRequestMock(private val handler: String) extends HttpServletRequest {
+    outTr.result
+}
 
-    override def getDispatcherType: DispatcherType = ???
+protected class ServletRequestMock(private val handler: String) extends HttpServletRequest {
 
-    override def getAsyncContext: AsyncContext = ???
+  override def getDispatcherType: DispatcherType = ???
 
-    override def isAsyncSupported: Boolean = ???
+  override def getAsyncContext: AsyncContext = ???
 
-    override def isAsyncStarted: Boolean = ???
+  override def isAsyncSupported: Boolean = ???
 
-    override def startAsync(servletRequest: ServletRequest, servletResponse: ServletResponse): AsyncContext = ???
+  override def isAsyncStarted: Boolean = ???
 
-    override def startAsync(): AsyncContext = ???
+  override def startAsync(servletRequest: ServletRequest, servletResponse: ServletResponse): AsyncContext = ???
 
-    override def getServletContext: ServletContext = ???
+  override def startAsync(): AsyncContext = ???
 
-    override def getLocalPort: Int = ???
+  override def getServletContext: ServletContext = ???
 
-    override def getLocalAddr: String = ???
+  override def getLocalPort: Int = ???
 
-    override def getLocalName: String = ???
+  override def getLocalAddr: String = ???
 
-    override def getRemotePort: Int = ???
+  override def getLocalName: String = ???
 
-    override def getRealPath(path: String): String = ???
+  override def getRemotePort: Int = ???
 
-    override def getRequestDispatcher(path: String): RequestDispatcher = ???
+  override def getRealPath(path: String): String = ???
 
-    override def isSecure: Boolean = ???
+  override def getRequestDispatcher(path: String): RequestDispatcher = ???
 
-    override def getLocales: util.Enumeration[Locale] = ???
+  override def isSecure: Boolean = ???
 
-    override def getLocale: Locale = ???
+  override def getLocales: util.Enumeration[Locale] = ???
 
-    override def removeAttribute(name: String): Unit = ???
+  override def getLocale: Locale = ???
 
-    override def setAttribute(name: String, o: scala.Any): Unit = ???
+  override def removeAttribute(name: String): Unit = ???
 
-    override def getRemoteHost: String = ???
+  override def setAttribute(name: String, o: scala.Any): Unit = ???
 
-    override def getRemoteAddr: String = ???
+  override def getRemoteHost: String = ???
 
-    override def getReader: BufferedReader = ???
+  override def getRemoteAddr: String = ???
 
-    override def getServerPort: Int = ???
+  override def getReader: BufferedReader = ???
 
-    override def getServerName: String = ???
+  override def getServerPort: Int = ???
 
-    override def getScheme: String = ???
+  override def getServerName: String = ???
 
-    override def getProtocol: String = ???
+  override def getScheme: String = ???
 
-    override def getParameterMap: util.Map[String, Array[String]] = ???
+  override def getProtocol: String = ???
 
-    override def getParameterValues(name: String): Array[String] = ???
+  override def getParameterMap: util.Map[String, Array[String]] = ???
 
-    override def getParameterNames: util.Enumeration[String] = ???
+  override def getParameterValues(name: String): Array[String] = ???
 
-    override def getParameter(name: String): String = ???
+  override def getParameterNames: util.Enumeration[String] = ???
 
-    override def getInputStream: ServletInputStream = ???
+  override def getParameter(name: String): String = ???
 
-    override def getContentType: String = ???
+  override def getInputStream: ServletInputStream = ???
 
-    override def getContentLength: Int = ???
+  override def getContentType: String = ???
 
-    override def setCharacterEncoding(env: String): Unit = ???
+  override def getContentLength: Int = ???
 
-    override def getCharacterEncoding: String = ???
+  override def setCharacterEncoding(env: String): Unit = ???
 
-    override def getAttributeNames: util.Enumeration[String] = ???
+  override def getCharacterEncoding: String = ???
 
-    override def getAttribute(name: String): AnyRef = ???
+  override def getAttributeNames: util.Enumeration[String] = ???
 
-    override def getPart(name: String): Part = ???
+  override def getAttribute(name: String): AnyRef = ???
 
-    override def getParts: util.Collection[Part] = ???
+  override def getPart(name: String): Part = ???
 
-    override def logout(): Unit = ???
+  override def getParts: util.Collection[Part] = ???
 
-    override def login(username: String, password: String): Unit = ???
+  override def logout(): Unit = ???
 
-    override def authenticate(response: HttpServletResponse): Boolean = ???
+  override def login(username: String, password: String): Unit = ???
 
-    override def isRequestedSessionIdFromUrl: Boolean = ???
+  override def authenticate(response: HttpServletResponse): Boolean = ???
 
-    override def isRequestedSessionIdFromURL: Boolean = ???
+  override def isRequestedSessionIdFromUrl: Boolean = ???
 
-    override def isRequestedSessionIdFromCookie: Boolean = ???
+  override def isRequestedSessionIdFromURL: Boolean = ???
 
-    override def isRequestedSessionIdValid: Boolean = ???
+  override def isRequestedSessionIdFromCookie: Boolean = ???
 
-    override def getSession: HttpSession = ???
+  override def isRequestedSessionIdValid: Boolean = ???
 
-    override def getSession(create: Boolean): HttpSession = ???
+  override def getSession: HttpSession = ???
 
-    override def getServletPath: String = ???
+  override def getSession(create: Boolean): HttpSession = ???
 
-    override def getRequestURL: StringBuffer = ???
+  override def getServletPath: String = ???
 
-    override def getRequestURI: String = ???
+  override def getRequestURL: StringBuffer = ???
 
-    override def getRequestedSessionId: String = ???
+  override def getRequestURI: String = ???
 
-    override def getUserPrincipal: Principal = ???
+  override def getRequestedSessionId: String = ???
 
-    override def isUserInRole(role: String): Boolean = ???
+  override def getUserPrincipal: Principal = ???
 
-    override def getRemoteUser: String = ???
+  override def isUserInRole(role: String): Boolean = ???
 
-    override def getQueryString: String = ???
+  override def getRemoteUser: String = ???
 
-    override def getContextPath: String = ???
+  override def getQueryString: String = ???
 
-    override def getPathTranslated: String = ???
+  override def getContextPath: String = ???
 
-    override def getPathInfo: String = handler
+  override def getPathTranslated: String = ???
 
-    override def getMethod: String = ???
+  override def getPathInfo: String = handler
 
-    override def getIntHeader(name: String): Int = ???
+  override def getMethod: String = ???
 
-    override def getHeaderNames: util.Enumeration[String] = ???
+  override def getIntHeader(name: String): Int = ???
 
-    override def getHeaders(name: String): util.Enumeration[String] = ???
+  override def getHeaderNames: util.Enumeration[String] = ???
 
-    override def getHeader(name: String): String = ???
+  override def getHeaders(name: String): util.Enumeration[String] = ???
 
-    override def getDateHeader(name: String): Long = ???
+  override def getHeader(name: String): String = ???
 
-    override def getCookies: Array[http.Cookie] = ???
+  override def getDateHeader(name: String): Long = ???
 
-    override def getAuthType: String = ???
-  }
+  override def getCookies: Array[http.Cookie] = ???
+
+  override def getAuthType: String = ???
+}
 
 
 }
