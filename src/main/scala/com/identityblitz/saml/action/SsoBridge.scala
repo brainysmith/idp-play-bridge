@@ -5,7 +5,7 @@ import com.identityblitz.login.glue.play.{Forwardable, LoginRequest, LoginAction
 import play.api.mvc.{Controller, AnyContent, Request}
 import com.identityblitz.saml.IdpPlayBridge._
 import scala.Some
-import com.identityblitz.login.{LoginFramework, FlowAttrName, RelyingParty}
+import com.identityblitz.login.{BuiltInRelyingParty, LoginFramework, FlowAttrName}
 import com.identityblitz.shibboleth.idp.util.HttpHelper
 import com.identityblitz.json.JVal
 import javax.security.auth.Subject
@@ -35,11 +35,8 @@ trait SsoBridge {
 
       val lr = LoginRequest.lrBuilder
         .withCallbackUri("fwd:" + contextPath + "/complete")
-        .withRelyingParty(new RelyingParty {
-        override def description: Option[String] = ???
-        override def host: String = ???
-        override def name: String = ???
-      }).build()
+        .withRelyingParty(BuiltInRelyingParty(idpLgnCtx.getRelyingPartyId, "SAML"))
+        .build()
 
       /** put the idp login context key into request cookies (mainly for sso case)**/
       req.copy(tags = req.tags ++ lr.toMap, headers = addCookie(HttpHelper.LOGIN_CTX_KEY_NAME, idpLgnCtx.getContextKey))
