@@ -58,7 +58,7 @@ trait SsoBridge {
 
     def success() = {
       /** the login complete successfully **/
-      val blitzLs = JVal.parseStr(request.tags("ls"))
+      val blitzLs = JVal.parse(request.tags("ls"))
       if (logger.isDebugEnabled)
         logger.debug("Authentication is successful: {}", blitzLs.toJson)
       val claims = blitzLs \ "claims"
