@@ -1,6 +1,6 @@
 package com.identityblitz.saml.service.spi
 
-import play.api.templates.Html
+import play.twirl.api.Html
 import play.api.mvc.Request
 
 /**

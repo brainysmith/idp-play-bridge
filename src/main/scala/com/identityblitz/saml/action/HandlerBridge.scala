@@ -7,6 +7,7 @@ import edu.internet2.middleware.shibboleth.idp.session.Session
 import com.identityblitz.saml.ws.transport.{PlayResponseAdapter, PlayRequestAdapter}
 import java.net.URL
 import play.api.Play
+import play.api.mvc.Result
 import scala.concurrent.Future
 import org.opensaml.ws.transport.{OutTransport, InTransport}
 import javax.servlet.http.{HttpSession, HttpServletResponse, Part, HttpServletRequest}
@@ -41,7 +42,7 @@ trait HandlerBridge {
     inTr -> new PlayResponseAdapter(inTr, request)
   }
 
-  protected def callHandler(handler: String)(implicit inTr: PlayRequestAdapter, outTr: PlayResponseAdapter): Future[SimpleResult] = {
+  protected def callHandler(handler: String)(implicit inTr: PlayRequestAdapter, outTr: PlayResponseAdapter): Future[Result] = {
     val errorHandler = handlerManager.getErrorHandler
     val idpHandler = handlerManager.getProfileHandler(new ServletRequestMock(handler)).asInstanceOf[ProfileHandler[InTransport,OutTransport]]
 

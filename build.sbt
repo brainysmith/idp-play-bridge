@@ -24,8 +24,7 @@ resolvers += "Local Maven Repository" at Path.userHome.asFile.toURI.toURL + "/.m
 resolvers += "Typesafe releases" at "http://repo.typesafe.com/typesafe/releases"
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" % "play_2.10" % "2.2.2",
-  /*"javax.servlet" % "javax.servlet-api" % "3.0.1" % "provided",*/
+  "com.typesafe.play" % "play_2.10" % "2.3.4",
   "com.identityblitz" % "login-framework" % "0.1.2",
   "edu.internet2.middleware" % "shibboleth-identityprovider" % "blitz-patched-pure",
   "org.scalatest" % "scalatest_2.10" % "2.0.1-SNAP" % "test,it",

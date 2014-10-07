@@ -1,6 +1,6 @@
 package com.identityblitz.saml.action
 
-import play.api.mvc.{Action, RequestHeader, Controller, SimpleResult}
+import play.api.mvc._
 import play.mvc.Http.HeaderNames
 import com.identityblitz.saml.ws.transport.{PlayResponseAdapter, PlayRequestAdapter}
 import com.identityblitz.shibboleth.idp.slo.SLOHelper
@@ -43,7 +43,7 @@ trait SloBridge {
   def toLogoutPage = Action(parse.raw) {
     implicit req => {
       implicit val (itr, otr) = getTransports
-      Option(SLOHelper.getSingleLogoutContext(storageService, itr, otr)).fold[SimpleResult]{
+      Option(SLOHelper.getSingleLogoutContext(storageService, itr, otr)).fold[Result]{
         logger.error("Single Logout servlet can not be called directly")
         otr.discardCookie(SLOHelper.SLO_CTX_KEY_NAME)
         NotFound.discardingCookies()
@@ -60,7 +60,7 @@ trait SloBridge {
   def logoutAction =  Forwardable.async(parse.raw) {
     implicit req => {
       implicit val (itr, otr) = getTransports
-      Option(SLOHelper.getSingleLogoutContext(storageService, itr, otr)).fold[Future[SimpleResult]]{
+      Option(SLOHelper.getSingleLogoutContext(storageService, itr, otr)).fold[Future[Result]]{
         logger.error("Single Logout servlet can not be called directly")
         otr.discardCookie(SLOHelper.SLO_CTX_KEY_NAME)
         Future.successful(NotFound)
